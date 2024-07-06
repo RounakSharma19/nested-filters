@@ -1,5 +1,5 @@
 import { Provider } from "react-redux";
-import { NestedFilter } from "./components";
+import { NestedFilter } from "./features";
 import store from "./store/store";
 
 function App() {

@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useImperativeHandle,
   useRef,
+  useState,
 } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
@@ -10,19 +11,10 @@ import { debounce } from "../utils";
 import "./SearchBar.css";
 
 type IProps = {
-  /*Placeholder for search */
   placeholder?: string;
-
-  /*Callback function for passing value to parent */
   onChange: (value: string) => void;
-
-  /*Callback function for clearing searched state */
   onCancel: () => void;
-
-  /*Background color for search box */
   background?: string;
-
-  /*Text color for placeholder text */
   placeholderTextColor?: string;
   padding?: string;
 };
@@ -44,14 +36,18 @@ const SearchBar: React.ForwardRefRenderFunction<ForwardedFunction, IProps> = (
     placeholderTextColor = "text-placeholder-secondary",
   } = props;
   const ref = useRef<HTMLInputElement | null>(null);
+  const [inputValue, setInputValue] = useState("");
 
   const handleChange = debounce(() => {
-    onChange(ref.current!.value);
+    const value = ref.current!.value;
+    setInputValue(value);
+    onChange(value);
   }, 500);
 
   const handleCancel = useCallback(() => {
     if (ref.current) {
       ref.current.value = "";
+      setInputValue("");
     }
     onCancel();
   }, [onCancel]);
@@ -67,6 +63,7 @@ const SearchBar: React.ForwardRefRenderFunction<ForwardedFunction, IProps> = (
       },
       set: (value: string) => {
         ref.current!.value = value;
+        setInputValue(value);
       },
     }),
     [handleCancel]
@@ -86,9 +83,11 @@ const SearchBar: React.ForwardRefRenderFunction<ForwardedFunction, IProps> = (
           type="text"
         />
       </div>
-      <div className="icon-container">
-        <FontAwesomeIcon icon={faTimes} onClick={handleCancel} />
-      </div>
+      {inputValue && (
+        <div className="icon-container">
+          <FontAwesomeIcon icon={faTimes} onClick={handleCancel} />
+        </div>
+      )}
     </div>
   );
 };
